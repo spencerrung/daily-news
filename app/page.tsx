@@ -1,47 +1,36 @@
-import type { NewsApiResponse } from "@/lib/types";
+import SOURCES from "@/config/sources";
+import { fetchSource } from "@/lib/fetchers";
+import { categorizeAll } from "@/lib/categorizer";
+import { deduplicateByUrl } from "@/lib/utils";
 import NewsApp from "@/components/NewsApp";
 
 export const revalidate = 900;
 
-async function getNews(): Promise<NewsApiResponse> {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL ??
-    (process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000");
-
-  const res = await fetch(`${baseUrl}/api/news`, {
-    next: { revalidate: 900 },
-  });
-
-  if (!res.ok) throw new Error(`Failed to fetch news: ${res.status}`);
-  return res.json();
-}
-
 export default async function Home() {
-  let data: NewsApiResponse;
+  const results = await Promise.all(
+    SOURCES.filter((s) => s.enabled).map((s) => fetchSource(s))
+  );
 
-  try {
-    data = await getNews();
-  } catch (err) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-        <div className="text-center">
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm">
-            Failed to load news. {String(err)}
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const enabledSources = SOURCES.filter((s) => s.enabled);
+  const errors = results
+    .map((r, i) => ({ sourceId: enabledSources[i].id, message: r.error ?? "" }))
+    .filter((e) => e.message);
 
-  // Dates come through JSON as strings — convert back
-  const items = data.items.map((item) => ({
+  const deduped = deduplicateByUrl(results.flatMap((r) => r.items));
+  const categorized = await categorizeAll(deduped);
+
+  categorized.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+
+  const items = categorized.map((item) => ({
     ...item,
     publishedAt: new Date(item.publishedAt),
   }));
 
   return (
-    <NewsApp items={items} fetchedAt={data.fetchedAt} errors={data.errors} />
+    <NewsApp
+      items={items}
+      fetchedAt={new Date().toISOString()}
+      errors={errors}
+    />
   );
 }
