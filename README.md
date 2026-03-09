@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Daily News
 
-## Getting Started
+Personal news aggregator running at [news.alucard.dev](https://news.alucard.dev). Pulls from Hacker News and RSS feeds, categorizes stories with keyword rules and a Claude Haiku fallback, and presents them in a filterable card UI.
 
-First, run the development server:
+<img src="public/news_preview.png" width="700" alt="Daily News preview" />
+
+## Setup
 
 ```bash
+npm install
+cp .env.local.example .env.local  # add your ANTHROPIC_API_KEY
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Adding Sources
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Edit `config/sources.ts`. Each entry is one of three types:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```ts
+// Hacker News
+{ id: "hn-top", type: "hackernews", displayName: "Hacker News", enabled: true, endpoint: "topstories", limit: 30 }
 
-## Learn More
+// RSS feed
+{ id: "ars-technica", type: "rss", displayName: "Ars Technica", enabled: true, url: "https://feeds.arstechnica.com/arstechnica/index", limit: 20 }
+```
 
-To learn more about Next.js, take a look at the following resources:
+Disable a source without removing it by setting `enabled: false`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## How Fetching Works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Every page load serves a cached response. The cache refreshes every 15 minutes (Next.js ISR).
 
-## Deploy on Vercel
+**Hacker News** — fetches the top N IDs from HN's ranked `topstories` list, then fetches each item individually. You always get whatever HN currently considers the top stories.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**RSS** — takes the first N items from the feed as-is, newest first. No ranking.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+After fetching, all results are:
+1. Deduplicated by URL
+2. Categorized (keyword rules → Claude Haiku batch fallback for anything unmatched)
+3. Sorted newest-first by default (Hot and Popular sort modes available in the UI)
+
+There is no history, read state, or pagination. Each refresh is a fresh snapshot.
+
+## Current Source Limits
+
+| Source | Limit |
+|---|---|
+| Hacker News | 30 |
+| TLDR Tech | 20 |
+| The Verge | 20 |
+| Lobste.rs | 25 |
+| Ars Technica | 20 |
+| Jeff Geerling | 15 |
+| xkcd | 10 |
+| The New Stack | 20 |
+| Bleeping Computer | 20 |
+| CNX Software | 15 |
+| Linux Gizmos | 15 |
+| CNCF Blog | 15 |
+
+Total ceiling ~195 articles before deduplication.
+
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | No | Enables LLM categorization. Without it, unmatched articles get tagged "Other" and the app still loads. |
+
+## Deployment
+
+Docker image is built and pushed to DockerHub via GitHub Actions on every push to `main`. Builds for `linux/amd64` and `linux/arm64` (Raspberry Pi k3s cluster).
