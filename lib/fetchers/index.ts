@@ -16,6 +16,8 @@ export async function fetchSource(
         return { items: await fetchRSS(config) };
     }
   } catch (e) {
-    return { items: [], error: String(e) };
+    const err = e instanceof Error ? e : new Error(String(e));
+    const cause = (err.cause instanceof Error) ? `: ${err.cause.message}` : "";
+    return { items: [], error: `${err.message}${cause}` };
   }
 }

@@ -1,7 +1,10 @@
 import Parser from "rss-parser";
 import type { RSSSourceConfig, NewsItem } from "@/lib/types";
 
-const parser = new Parser();
+const parser = new Parser({
+  timeout: 10_000,
+  headers: { "User-Agent": "daily-news-aggregator/1.0" },
+});
 
 export async function fetchRSS(config: RSSSourceConfig): Promise<NewsItem[]> {
   const feed = await parser.parseURL(config.url);

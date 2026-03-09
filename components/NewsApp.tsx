@@ -14,10 +14,10 @@ import Feed from "./Feed";
 interface NewsAppProps {
   items: NewsItem[];
   fetchedAt: string;
-  errors: { sourceId: string; message: string }[];
+  criticalFailure: boolean;
 }
 
-export default function NewsApp({ items, fetchedAt, errors }: NewsAppProps) {
+export default function NewsApp({ items, fetchedAt, criticalFailure }: NewsAppProps) {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("card");
@@ -130,18 +130,11 @@ export default function NewsApp({ items, fetchedAt, errors }: NewsAppProps) {
 
         {/* Main feed */}
         <main className="flex-1 min-w-0">
-          {errors.length > 0 && (
+          {criticalFailure && (
             <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-              <p className="text-xs font-medium text-red-700 dark:text-red-400 mb-1">
-                Some sources failed to load:
+              <p className="text-xs text-red-700 dark:text-red-400">
+                All sources failed to load. Check server logs for details.
               </p>
-              <ul className="text-xs text-red-600 dark:text-red-500 space-y-0.5">
-                {errors.map((e) => (
-                  <li key={e.sourceId}>
-                    {e.sourceId}: {e.message}
-                  </li>
-                ))}
-              </ul>
             </div>
           )}
           <div className="flex flex-wrap items-center justify-between gap-2 mb-4">

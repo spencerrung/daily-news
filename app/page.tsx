@@ -12,20 +12,28 @@ export default async function Home() {
   );
 
   const enabledSources = SOURCES.filter((s) => s.enabled);
-  const errors = results
-    .map((r, i) => ({ sourceId: enabledSources[i].id, message: r.error ?? "" }))
-    .filter((e) => e.message);
+
+  // Log individual source failures server-side only
+  results.forEach((r, i) => {
+    if (r.error) {
+      console.error(`[daily-news] source "${enabledSources[i].id}" failed: ${r.error}`);
+    }
+  });
 
   const deduped = deduplicateByUrl(results.flatMap((r) => r.items));
   const categorized = await categorizeAll(deduped);
 
   categorized.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 
+  // Only surface a critical error if every source failed
+  const totalFailed = results.filter((r) => r.error).length;
+  const criticalFailure = totalFailed === enabledSources.length;
+
   return (
     <NewsApp
       items={categorized}
       fetchedAt={new Date().toISOString()}
-      errors={errors}
+      criticalFailure={criticalFailure}
     />
   );
 }
