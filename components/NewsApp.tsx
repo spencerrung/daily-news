@@ -144,7 +144,7 @@ export default function NewsApp({ items, fetchedAt, errors }: NewsAppProps) {
               </ul>
             </div>
           )}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
             <div className="flex items-center gap-2">
               <SortBar value={sortMode} onChange={setSortMode} />
               <ViewToggle value={viewMode} onChange={setViewMode} />
