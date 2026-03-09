@@ -3,3 +3,21 @@
 @theme inline {
   --font-sans: var(--font-geist);
 }
+
+/* Subtle scrollbars */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0% 0 0 / 15%);
+  border-radius: 9999px;
+}
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: oklch(100% 0 0 / 15%);
+  }
+}

@@ -82,6 +82,14 @@ const SOURCES: AnySourceConfig[] = [
     limit: 15,
   },
   {
+    id: "cncf-blog",
+    type: "rss",
+    displayName: "CNCF Blog",
+    enabled: true,
+    url: "https://www.cncf.io/blog/feed/",
+    limit: 15,
+  },
+  {
     id: "linux-gizmos",
     type: "rss",
     displayName: "Linux Gizmos",
