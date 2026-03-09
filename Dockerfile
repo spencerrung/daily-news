@@ -27,7 +27,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # ── Stage 3: runtime ─────────────────────────────────────────────────────────
-FROM node:20-alpine AS runner
+FROM node:25-alpine AS runner
 
 RUN addgroup -S app && adduser -S app -G app
 WORKDIR /app
