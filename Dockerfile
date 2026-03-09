@@ -27,11 +27,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # ── Stage 3: runtime ─────────────────────────────────────────────────────────
-FROM cgr.dev/chainguard/node:latest AS runner
+FROM node:20-alpine AS runner
 
-USER root
-RUN mkdir -p /app && chown 65532:65532 /app
-USER 65532
+RUN addgroup -S app && adduser -S app -G app
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -39,10 +37,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 
-COPY --chown=65532:65532 --from=builder /app/.next/standalone ./
-COPY --chown=65532:65532 --from=builder /app/.next/static ./.next/static
-COPY --chown=65532:65532 --from=builder /app/public ./public
+COPY --chown=app:app --from=builder /app/.next/standalone ./
+COPY --chown=app:app --from=builder /app/.next/static ./.next/static
+COPY --chown=app:app --from=builder /app/public ./public
+
+USER app
 
 EXPOSE 3000
 
-CMD ["server.js"]
+CMD ["node", "server.js"]
