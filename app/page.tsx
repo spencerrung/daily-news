@@ -19,16 +19,11 @@ export default async function Home() {
   const deduped = deduplicateByUrl(results.flatMap((r) => r.items));
   const categorized = await categorizeAll(deduped);
 
-  categorized.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-
-  const items = categorized.map((item) => ({
-    ...item,
-    publishedAt: new Date(item.publishedAt),
-  }));
+  categorized.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 
   return (
     <NewsApp
-      items={items}
+      items={categorized}
       fetchedAt={new Date().toISOString()}
       errors={errors}
     />

@@ -17,6 +17,7 @@ export async function fetchHackerNews(
 ): Promise<NewsItem[]> {
   const idsRes = await fetch(`${HN_BASE}/${config.endpoint}.json`, {
     next: { revalidate: 900 },
+    signal: AbortSignal.timeout(10_000),
   });
   if (!idsRes.ok) throw new Error(`HN IDs fetch failed: ${idsRes.status}`);
   const ids: number[] = await idsRes.json();
@@ -24,11 +25,16 @@ export async function fetchHackerNews(
   const sliced = ids.slice(0, config.limit);
   const items = await Promise.all(
     sliced.map(async (id) => {
-      const res = await fetch(`${HN_BASE}/item/${id}.json`, {
-        next: { revalidate: 900 },
-      });
-      if (!res.ok) return null;
-      return res.json() as Promise<HNItem>;
+      try {
+        const res = await fetch(`${HN_BASE}/item/${id}.json`, {
+          next: { revalidate: 900 },
+          signal: AbortSignal.timeout(5_000),
+        });
+        if (!res.ok) return null;
+        return res.json() as Promise<HNItem>;
+      } catch {
+        return null;
+      }
     })
   );
 
@@ -46,7 +52,7 @@ export async function fetchHackerNews(
       sourceName: config.displayName,
       score: item.score,
       commentCount: item.descendants,
-      publishedAt: new Date((item.time ?? 0) * 1000),
+      publishedAt: new Date((item.time ?? 0) * 1000).toISOString(),
       tags: [],
       categorizedBy: "none",
     }));

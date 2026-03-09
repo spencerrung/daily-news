@@ -15,7 +15,7 @@ export async function fetchRSS(config: RSSSourceConfig): Promise<NewsItem[]> {
       url: item.link!,
       source: "rss" as const,
       sourceName: config.displayName,
-      publishedAt: item.pubDate ? new Date(item.pubDate) : new Date(),
+      publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
       tags: [],
       categorizedBy: "none" as const,
     }));

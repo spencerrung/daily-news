@@ -85,7 +85,7 @@ export async function fetchReddit(
       sourceName: config.displayName,
       score: post.data.score,
       commentCount: post.data.num_comments,
-      publishedAt: new Date(post.data.created_utc * 1000),
+      publishedAt: new Date(post.data.created_utc * 1000).toISOString(),
       tags: [],
       categorizedBy: "none" as const,
     }));

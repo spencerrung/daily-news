@@ -15,7 +15,7 @@ function applySort(items: NewsItem[], mode: SortMode): NewsItem[] {
   const copy = [...items];
   switch (mode) {
     case "newest":
-      return copy.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+      return copy.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
     case "hot":
       return copy.sort((a, b) => hotScore(b) - hotScore(a));
     case "popular":

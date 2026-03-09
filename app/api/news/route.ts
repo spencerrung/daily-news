@@ -23,9 +23,7 @@ export async function GET() {
   const deduped = deduplicateByUrl(allItems);
   const categorized = await categorizeAll(deduped);
 
-  categorized.sort(
-    (a, b) => b.publishedAt.getTime() - a.publishedAt.getTime()
-  );
+  categorized.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 
   const response: NewsApiResponse = {
     items: categorized,

@@ -7,7 +7,7 @@ export interface NewsItem {
   sourceName: string;
   score?: number;
   commentCount?: number;
-  publishedAt: Date;
+  publishedAt: string; // ISO 8601 — keeps it serializable across server/client boundary
   tags: string[];
   categorizedBy: "rules" | "llm" | "none";
 }

@@ -33,7 +33,7 @@ export default function NewsCard({ item, onTagClick, view = "card" }: NewsCardPr
         <div className="pointer-events-none flex items-center gap-3 min-w-0 w-full">
           <SourceBadge source={item.source} sourceName={item.sourceName} />
           <p className="flex-1 text-sm text-zinc-800 dark:text-zinc-200 truncate">{item.title}</p>
-          <span className="text-xs text-zinc-400 dark:text-zinc-500 shrink-0">{timeAgo(new Date(item.publishedAt))}</span>
+          <span className="text-xs text-zinc-400 dark:text-zinc-500 shrink-0" suppressHydrationWarning>{timeAgo(new Date(item.publishedAt))}</span>
           {item.commentsUrl && item.commentCount !== undefined && (
             <a
               href={item.commentsUrl}
@@ -86,7 +86,7 @@ export default function NewsCard({ item, onTagClick, view = "card" }: NewsCardPr
                 <MessageSquare className="w-3 h-3" />{item.commentCount.toLocaleString()}
               </a>
             )}
-            <span className="flex items-center gap-1 ml-auto"><Clock className="w-3 h-3" />{timeAgo(new Date(item.publishedAt))}</span>
+            <span className="flex items-center gap-1 ml-auto" suppressHydrationWarning><Clock className="w-3 h-3" />{timeAgo(new Date(item.publishedAt))}</span>
           </div>
         </div>
       </article>
@@ -114,7 +114,7 @@ export default function NewsCard({ item, onTagClick, view = "card" }: NewsCardPr
               <MessageSquare className="w-3 h-3" />{item.commentCount.toLocaleString()}
             </a>
           )}
-          <span className="flex items-center gap-1 ml-auto"><Clock className="w-3 h-3" />{timeAgo(new Date(item.publishedAt))}</span>
+          <span className="flex items-center gap-1 ml-auto" suppressHydrationWarning><Clock className="w-3 h-3" />{timeAgo(new Date(item.publishedAt))}</span>
         </div>
       </div>
     </article>
