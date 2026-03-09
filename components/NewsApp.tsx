@@ -8,6 +8,7 @@ import { useNewsFilters } from "@/hooks/useNewsFilters";
 import FilterSidebar from "./FilterSidebar";
 import SearchBar from "./SearchBar";
 import SortBar from "./SortBar";
+import ViewToggle, { type ViewMode } from "./ViewToggle";
 import Feed from "./Feed";
 
 interface NewsAppProps {
@@ -19,6 +20,7 @@ interface NewsAppProps {
 export default function NewsApp({ items, fetchedAt, errors }: NewsAppProps) {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("card");
   const {
     selectedTags,
     selectedSources,
@@ -143,12 +145,15 @@ export default function NewsApp({ items, fetchedAt, errors }: NewsAppProps) {
             </div>
           )}
           <div className="flex items-center justify-between mb-4">
-            <SortBar value={sortMode} onChange={setSortMode} />
+            <div className="flex items-center gap-2">
+              <SortBar value={sortMode} onChange={setSortMode} />
+              <ViewToggle value={viewMode} onChange={setViewMode} />
+            </div>
             <span className="text-xs text-zinc-400 dark:text-zinc-600">
               {filteredItems.length} stories
             </span>
           </div>
-          <Feed items={filteredItems} onTagClick={toggleTag} />
+          <Feed items={filteredItems} onTagClick={toggleTag} view={viewMode} />
         </main>
       </div>
     </div>
