@@ -31,7 +31,7 @@ const SOURCES: AnySourceConfig[] = [
     displayName: "Lobste.rs",
     enabled: true,
     url: "https://lobste.rs/rss",
-    limit: 25,
+    limit: 10,
   },
   {
     id: "ars-technica",
@@ -87,6 +87,22 @@ const SOURCES: AnySourceConfig[] = [
     displayName: "CNCF Blog",
     enabled: true,
     url: "https://www.cncf.io/blog/feed/",
+    limit: 15,
+  },
+  {
+    id: "lwn",
+    type: "rss",
+    displayName: "LWN.net",
+    enabled: true,
+    url: "https://lwn.net/headlines/rss",
+    limit: 15,
+  },
+  {
+    id: "phoronix",
+    type: "rss",
+    displayName: "Phoronix",
+    enabled: true,
+    url: "https://www.phoronix.com/rss.php",
     limit: 15,
   },
   {
